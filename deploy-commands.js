@@ -7,7 +7,6 @@ dotenv.config();
 const guildId = process.env.CHANNEL;
 const clientId = process.env.CLIENT;
 const commands = [
-    new SlashCommandBuilder().setName("ping").setDescription("Replies with pong!"),
     new SlashCommandBuilder().setName("모집").setDescription("팀 만들기"),
     new SlashCommandBuilder().setName("마감").setDescription("모집 마감"),
 ].map((command) => command.toJSON());

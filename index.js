@@ -26,9 +26,7 @@ let userList = [];
 client.on("interactionCreate", async (interection) => {
     const { commandName } = interection;
     if (!interection.isCommand()) return;
-    if (commandName === "ping") {
-        await interection.reply("Pong!");
-    } else if (commandName === "모집") {
+    if (commandName === "모집") {
         const confirm = new MessageActionRow().addComponents(
             new MessageButton()
                 .setCustomId("join")
@@ -47,35 +45,36 @@ client.on("interactionCreate", async (interection) => {
             components: [confirm],
         });
 
-        const filter = (i) => {
-            if (i.user.id === interaction.user.id) {
-                console.log("같음");
-                return true;
-            }
-            return i.reply({ content: "선택하셨습니다." });
-        };
         const collector = interection.channel.createMessageComponentCollector({
-            filter,
             max: 1,
-            time: 15000,
         });
 
-        collector.on("end", async (btnInterection) => {
-            console.log(btnInterection.first().customId);
-            btnInterection.forEach((click) => {
-                console.log(click.user.id, click.customId);
-            });
-            if (btnInterection.first.customId === "join") {
-                const editBtn = new MessageEmbed()
-                    .setColor("#3498DB")
-                    .setDescription("선택하셨습니다.");
-                await interaction.editReply({
-                    embeds: [editBtn],
+        collector.on("collect", async (i) => {
+            if (i.customId === "join") {
+                await i.update({
+                    content: "A button was clicked!",
                     ephemeral: true,
                     components: [],
+                    embeds: [],
                 });
             }
         });
+
+        // collector.on("end", async (btnInterection) => {
+        //     btnInterection.forEach((click) => {
+        //         console.log(click.user.id, click.customId);
+        //     });
+        //     if (btnInterection.first.customId === "join") {
+        //         const editBtn = new MessageEmbed()
+        //             .setColor("#3498DB")
+        //             .setDescription("선택하셨습니다.");
+        //         await interaction.editReply({
+        //             embeds: [editBtn],
+        //             ephemeral: true,
+        //             components: [],
+        //         });
+        //     }
+        // });
     } else if (commandName === "마감") {
         const embed = new MessageEmbed()
             .setColor("#3498DB")
@@ -92,9 +91,12 @@ client.on("interactionCreate", async (interection) => {
 
 // client.on("interactionCreate", (interaction) => {
 //     if (!interaction.isButton()) return;
-//     if (interaction.customId === "join") {
-//         userList.push(interaction.user.username);
+//     if (interaction.message.interaction.user.id !== interaction.user.id) {
+//         console.log(interaction);
 //     }
+//     // if (interaction.customId === "join") {
+//     //     userList.push(interaction.user.username);
+//     // }
 //     console.log(userList);
 // });
 
