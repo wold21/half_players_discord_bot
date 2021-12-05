@@ -17,38 +17,42 @@ client.once("ready", () => {
 
 function memberProcess(arr) {
     let data = {};
-    let waitingMember = [];
-    let team_one = [];
-    let team_two = [];
-    arr.sort(() => Math.random() - 0.5);
-    arr.forEach((item, index) => {
-        if (index > 21) {
-            waitingMember.push(" " + item);
-        } else {
-            if (index % 2 != 0) {
-                team_one.push(" " + item);
-            } else if (index % 2 == 0) {
-                team_two.push(" " + item);
+    if (arr.length < 22) {
+        data.flag = false;
+        data.length = arr.length;
+    } else {
+        let waitingMember = [];
+        let team_one = [];
+        let team_two = [];
+        arr.sort(() => Math.random() - 0.5);
+        arr.forEach((item, index) => {
+            if (index > 21) {
+                waitingMember.push(" " + item);
+            } else {
+                if (index % 2 != 0) {
+                    team_one.push(" " + item);
+                } else if (index % 2 == 0) {
+                    team_two.push(" " + item);
+                }
             }
-        }
-    });
-    data.team_one = team_one;
-    data.team_two = team_two;
-    data.waitingMember =
-        waitingMember.length != 0 ? waitingMember : "대기 인원이 없습니다.";
+        });
+        data.team_one = Array.from(new Set(team_one));
+        data.team_two = Array.from(new Set(team_two));
+        data.waitingMember =
+            waitingMember.length != 0
+                ? Array.from(new Set(waitingMember))
+                : "대기 인원이 없습니다.";
+    }
     return data;
 }
 
 let userList = [
-    "echo",
-    "vein",
-    "twitch",
-    "missfortune",
-    "ashe",
+    "base",
+    "comma",
     "blily",
-    "kim",
-    "park",
-    "choi",
+    "fox",
+    "golf",
+    "hotel",
     "lee",
     "kang",
     "song",
@@ -63,56 +67,59 @@ let userList = [
     "eight",
 ];
 
-client.on("interactionCreate", async (interection) => {
-    const { commandName } = interection;
-    if (!interection.isCommand()) return;
+client.on("interactionCreate", async (interaction) => {
+    const { commandName } = interaction;
+    if (!interaction.isCommand()) return;
     if (commandName === "team") {
-        const confirm = new MessageActionRow().addComponents(
+        const btn = new MessageActionRow().addComponents(
             new MessageButton().setCustomId("join").setLabel("참가").setStyle("SUCCESS"),
             new MessageButton().setCustomId("not").setLabel("참가안함").setStyle("DANGER")
         );
         const embed = new MessageEmbed().setColor("#3498DB").setTitle("🛎 내전 모집");
 
-        await interection.reply({
+        await interaction.reply({
             embeds: [embed],
-            components: [confirm],
+            components: [btn],
         });
     } else if (commandName === "split") {
         let result = memberProcess(userList);
-        const embed = new MessageEmbed()
-            .setColor("#3498DB")
-            .setTitle("⚽️ 결과")
-            .setDescription(
-                `1️⃣팀 : ${result.team_one}  \n\n 2️⃣팀 : ${result.team_two} \n\n 📌 대기 : ${result.waitingMember}`
-            )
-            .setTimestamp();
-        interection.reply({
-            embeds: [embed],
-        });
+        if (!result.flag) {
+            const embed = new MessageEmbed()
+                .setColor("#3498DB")
+                .setTitle("⚽️ 인원이 부족합니다")
+                .setDescription(`현재 신청 인원 ${result.length}명`);
+
+            await interaction.deferReply();
+            await interaction.editReply({ embeds: [embed], components: [] });
+        } else {
+            const embed = new MessageEmbed()
+                .setColor("#3498DB")
+                .setTitle("⚽️ 결과")
+                .setDescription(
+                    `1️⃣팀 : ${result.team_one}  \n\n 2️⃣팀 : ${result.team_two} \n\n 📌 대기 : ${result.waitingMember}`
+                );
+
+            await interaction.deferReply();
+            await interaction.editReply({ embeds: [embed], components: [] });
+        }
     }
 });
 
 client.on("interactionCreate", (interaction) => {
+    let returnMsg = "";
     if (!interaction.isButton()) return;
     if (interaction.customId === "join") {
-        interaction.reply({ content: "선택하셨습니다.", ephemeral: true });
         userList.push(interaction.user.username);
+        returnMsg = "내전에 참여합니다.";
+    } else if (interaction.customId === "not") {
+        if (userList.indexOf(interaction.user.username)) {
+            userList.splice(userList.indexOf(interaction.user.username));
+        }
+        returnMsg =
+            "내전에 참여하지 않습니다.\n참가 신청을 한 경우 팀 리스트에서 삭제됩니다.";
     }
+    interaction.reply({ content: `${returnMsg}`, ephemeral: true });
+    console.log(userList);
 });
 
 client.login(process.env.TOKEN);
-
-//   const guild = client.guilds.cache.get(process.env.CHANNEL);
-//   const getList = guild.members.cache.filter(
-//     (member) => member.presence?.status === "online"
-//   );
-
-//   getList.forEach((item, i) => {
-//     userList.push(item.user);
-//   });
-
-//   userList.forEach(function (item, i) {
-//     if (item.bot === false) {
-//       console.log(item.username);
-//     }
-//   });
