@@ -9,33 +9,64 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const client = new Client({ intents: [32767] });
-// const prefix = "!";
 
 client.once("ready", () => {
     console.log("Ready!");
     client.user.setActivity("축구", { type: "WATCHING" });
 });
 
-let userList = [];
-// client.on("messageCreate", async (message) => {
-//     const args = message.content.slice(prefix.length).trim().split(/ +/g);
-//     const command = args.shift();
-//     if (command === "모집") {
-//         const embed = new MessageEmbed().setColor("#3498DB").setTitle("🛎 내전 모집");
+function memberProcess(arr) {
+    let data = {};
+    let waitingMember = [];
+    let team_one = [];
+    let team_two = [];
+    arr.sort(() => Math.random() - 0.5);
+    arr.forEach((item, index) => {
+        if (index > 21) {
+            waitingMember.push(" " + item);
+        } else {
+            if (index % 2 != 0) {
+                team_one.push(" " + item);
+            } else if (index % 2 == 0) {
+                team_two.push(" " + item);
+            }
+        }
+    });
+    data.team_one = team_one;
+    data.team_two = team_two;
+    data.waitingMember =
+        waitingMember.length != 0 ? waitingMember : "대기 인원이 없습니다.";
+    return data;
+}
 
-//         const btns = new MessageActionRow().addComponents(
-//             new MessageButton().setCustomId("join").setLabel("참가").setStyle("SUCCESS"),
-//             new MessageButton().setCustomId("not").setLabel("참가안함").setStyle("DANGER")
-//         );
-
-//         message.channel.send({ embeds: [embed], components: [btns] });
-//     }
-// });
+let userList = [
+    "echo",
+    "vein",
+    "twitch",
+    "missfortune",
+    "ashe",
+    "blily",
+    "kim",
+    "park",
+    "choi",
+    "lee",
+    "kang",
+    "song",
+    "son",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+];
 
 client.on("interactionCreate", async (interection) => {
     const { commandName } = interection;
     if (!interection.isCommand()) return;
-    if (commandName === "모집") {
+    if (commandName === "team") {
         const confirm = new MessageActionRow().addComponents(
             new MessageButton().setCustomId("join").setLabel("참가").setStyle("SUCCESS"),
             new MessageButton().setCustomId("not").setLabel("참가안함").setStyle("DANGER")
@@ -46,46 +77,18 @@ client.on("interactionCreate", async (interection) => {
             embeds: [embed],
             components: [confirm],
         });
-
-        // collector.on("collect", async (i) => {
-        //     if (i.customId === "join") {
-        //         const editBtn = new MessageEmbed()
-        //             .setColor("#3498DB")
-        //             .setDescription("참가를 선택하셨습니다.");
-        //         await i.update({
-        //             embeds: [editBtn],
-        //             components: [],
-        //         });
-        //     }
-
-        //     if (i.customId === "not join") {
-        //         const editBtn = new MessageEmbed()
-        //             .setColor("#3498DB")
-        //             .setDescription("참가안함을 선택하셨습니다.");
-        //         await i.update({
-        //             embeds: [editBtn],
-        //             components: [],
-        //         });
-        //     }
-        // });
-
-        // collector.on("end", async (btnInterection) => {
-        //     btnInterection.forEach((click) => {
-        //         console.log(click.user.id, click.customId);
-        //     });
-        //     if (btnInterection.first.customId === "join") {
-        //     }
-        // });
-    } else if (commandName === "마감") {
+    } else if (commandName === "split") {
+        let result = memberProcess(userList);
         const embed = new MessageEmbed()
             .setColor("#3498DB")
-            .setTitle("결과")
-            .setDescription(`1️⃣팀 :${userList}  \n 2️⃣팀 : test`)
+            .setTitle("⚽️ 결과")
+            .setDescription(
+                `1️⃣팀 : ${result.team_one}  \n\n 2️⃣팀 : ${result.team_two} \n\n 📌 대기 : ${result.waitingMember}`
+            )
             .setTimestamp();
-        await interaction.reply({
+        interection.reply({
             embeds: [embed],
         });
-        await interaction.reply(`${userList}`);
     }
 });
 
@@ -95,7 +98,6 @@ client.on("interactionCreate", (interaction) => {
         interaction.reply({ content: "선택하셨습니다.", ephemeral: true });
         userList.push(interaction.user.username);
     }
-    console.log(userList);
 });
 
 client.login(process.env.TOKEN);
