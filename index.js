@@ -19,6 +19,7 @@ const client = new Client({
 
 client.once("ready", () => {
     console.log("Ready!");
+    client.user.setActivity("축구", { type: "WATCHING" });
 });
 
 let userList = [];
@@ -46,35 +47,41 @@ client.on("interactionCreate", async (interection) => {
         });
 
         const collector = interection.channel.createMessageComponentCollector({
-            max: 1,
+            max: 2,
         });
 
         collector.on("collect", async (i) => {
+            console.log(i);
             if (i.customId === "join") {
+                const editBtn = new MessageEmbed()
+                    .setColor("#3498DB")
+                    .setDescription("참가를 선택하셨습니다.");
                 await i.update({
-                    content: "A button was clicked!",
+                    embeds: [editBtn],
                     ephemeral: true,
                     components: [],
-                    embeds: [],
+                });
+            }
+
+            if (i.customId === "not join") {
+                const editBtn = new MessageEmbed()
+                    .setColor("#3498DB")
+                    .setDescription("참가안함을 선택하셨습니다.");
+                await i.update({
+                    embeds: [editBtn],
+                    ephemeral: true,
+                    components: [],
                 });
             }
         });
 
-        // collector.on("end", async (btnInterection) => {
-        //     btnInterection.forEach((click) => {
-        //         console.log(click.user.id, click.customId);
-        //     });
-        //     if (btnInterection.first.customId === "join") {
-        //         const editBtn = new MessageEmbed()
-        //             .setColor("#3498DB")
-        //             .setDescription("선택하셨습니다.");
-        //         await interaction.editReply({
-        //             embeds: [editBtn],
-        //             ephemeral: true,
-        //             components: [],
-        //         });
-        //     }
-        // });
+        collector.on("end", async (btnInterection) => {
+            btnInterection.forEach((click) => {
+                console.log(click.user.id, click.customId);
+            });
+            if (btnInterection.first.customId === "join") {
+            }
+        });
     } else if (commandName === "마감") {
         const embed = new MessageEmbed()
             .setColor("#3498DB")
