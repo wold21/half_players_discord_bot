@@ -116,7 +116,7 @@ client.on("interactionCreate", (interaction) => {
             userList.splice(userList.indexOf(interaction.user.username));
         }
         returnMsg =
-            "내전에 참여하지 않습니다.\n참가 신청을 한 경우 팀 리스트에서 삭제됩니다.";
+            "내전에 참여하지 않습니다.\n참가 신청을 했던 경우 팀 리스트에서 삭제됩니다.";
     }
     interaction.reply({ content: `${returnMsg}`, ephemeral: true });
     console.log(userList);
