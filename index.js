@@ -14,12 +14,16 @@ client.once("ready", () => {
     client.user.setActivity("축구", { type: "WATCHING" });
 });
 
-function memberProcess(arr, size_one, size_two) {
+function memberProcess(arr, s1, s2) {
     let data = {};
-    if (arr.length < 22) {
+    if (arr.length < (s1 + s2)) {
         data.flag = false;
         data.length = arr.length;
     } else {
+        const t1 = new Array(s1);
+        const t2 = new Array(s2);
+
+        // 여기서 부터 작성 필요 =====================================
         let waitingMember = [];
         let team_one = [];
         let team_two = [];
