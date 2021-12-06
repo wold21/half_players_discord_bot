@@ -5,8 +5,7 @@ const {
     MessageButton,
     MessageEmbed,
 } = require("discord.js");
-const dotenv = require("dotenv");
-dotenv.config();
+const { token } = require('./.config.json');
 
 const client = new Client({ intents: [32767] });
 
@@ -15,12 +14,16 @@ client.once("ready", () => {
     client.user.setActivity("축구", { type: "WATCHING" });
 });
 
-function memberProcess(arr) {
+function memberProcess(arr, s1, s2) {
     let data = {};
-    if (arr.length < 22) {
+    if (arr.length < (s1 + s2)) {
         data.flag = false;
         data.length = arr.length;
     } else {
+        const t1 = new Array(s1);
+        const t2 = new Array(s2);
+
+        // 여기서 부터 작성 필요 =====================================
         let waitingMember = [];
         let team_one = [];
         let team_two = [];
@@ -70,19 +73,20 @@ let userList = [
 client.on("interactionCreate", async (interaction) => {
     const { commandName } = interaction;
     if (!interaction.isCommand()) return;
+    console.log(interaction.options.getString("a"));
+    console.log(interaction.options.getString("b"));
     if (commandName === "team") {
         const btn = new MessageActionRow().addComponents(
             new MessageButton().setCustomId("join").setLabel("참가").setStyle("SUCCESS"),
             new MessageButton().setCustomId("not").setLabel("참가안함").setStyle("DANGER")
         );
         const embed = new MessageEmbed().setColor("#3498DB").setTitle("🛎 내전 모집");
-
         await interaction.reply({
             embeds: [embed],
             components: [btn],
         });
     } else if (commandName === "split") {
-        let result = memberProcess(userList);
+        let result = memberProcess(userList, a, b);
         if (!result.flag) {
             const embed = new MessageEmbed()
                 .setColor("#3498DB")
@@ -98,7 +102,6 @@ client.on("interactionCreate", async (interaction) => {
                 .setDescription(
                     `1️⃣팀 : ${result.team_one}  \n\n 2️⃣팀 : ${result.team_two} \n\n 📌 대기 : ${result.waitingMember}`
                 );
-
             await interaction.deferReply();
             await interaction.editReply({ embeds: [embed], components: [] });
         }
@@ -122,4 +125,4 @@ client.on("interactionCreate", (interaction) => {
     console.log(userList);
 });
 
-client.login(process.env.TOKEN);
+client.login(token);
