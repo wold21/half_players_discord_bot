@@ -45,7 +45,26 @@ function memberProcess(arr, s1, s2) {
     return data;
 }
 
-let userList = [];
+let userList = [    
+"base",
+"comma",
+"blily",
+"fox",
+"golf",
+"hotel",
+"lee",
+"kang",
+"song",
+"son",
+"one",
+"two",
+"three",
+"four",
+"five",
+"six",
+"seven",
+"eight",
+];
 
 let memberCount = {};
 client.on("interactionCreate", async (interaction) => {
