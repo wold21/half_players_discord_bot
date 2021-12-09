@@ -105,11 +105,11 @@ client.on("interactionCreate", (interaction) => {
     let returnMsg = "";
     if (!interaction.isButton()) return;
     if (interaction.customId === "join") {
-        userList.push(interaction.user.username);
+        userList.push(interaction.member.nickname);
         returnMsg = "내전에 참여합니다.";
     } else if (interaction.customId === "not") {
-        if (userList.indexOf(interaction.user.username)) {
-            userList.splice(userList.indexOf(interaction.user.username));
+        if (userList.indexOf(interaction.member.nickname)) {
+            userList.splice(userList.indexOf(interaction.member.nickname));
         }
         returnMsg =
             "내전에 참여하지 않습니다.\n참가 신청을 했던 경우 팀 리스트에서 삭제됩니다.";
