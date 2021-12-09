@@ -20,27 +20,26 @@ function memberProcess(arr, s1, s2) {
     let t2 = [];
     let waitingMember = [];
     let total = s1 + s2;
-
-    if (arr.length < total || arr.length === 0) {
+    let setArr = Array.from(new Set(arr));
+    if (setArr.length < total || setArr.length === 0) {
         data.flag = false;
-        data.length = arr.length;
+        data.length = setArr.length;
     } else {
-        arr.sort(() => Math.random() - 0.5);
+        setArr.sort(() => Math.random() - 0.5);
         for (let i = 0; i < s1; i++) {
-            t1.push(" " + arr.pop());
+            t1.push(" " + setArr.pop());
         }
         for (let i = 0; i < s2; i++) {
-            t2.push(" " + arr.pop());
+            t2.push(" " + setArr.pop());
         }
 
-        if (arr.length != 0) {
-            waitingMember.push(arr);
+        if (setArr.length != 0) {
+            waitingMember.push(setArr);
         }
         data.flag = true;
-        data.t1 = Array.from(new Set(t1));
-        data.t2 = Array.from(new Set(t2));
-        data.waitingMember =
-            arr.length != 0 ? Array.from(new Set(arr)) : "대기 인원이 없습니다.";
+        data.t1 = t1;
+        data.t2 = t2;
+        data.waitingMember = arr.length != 0 ? setArr : "대기 인원이 없습니다.";
     }
     return data;
 }
@@ -52,6 +51,7 @@ client.on("interactionCreate", async (interaction) => {
     const { commandName } = interaction;
     if (!interaction.isCommand()) return;
     if (commandName === "team") {
+        await interaction.deferReply();
         memberCount.a = parseInt(interaction.options.getString("a"));
         memberCount.b = parseInt(interaction.options.getString("b"));
         const btn = new MessageActionRow().addComponents(
@@ -59,7 +59,7 @@ client.on("interactionCreate", async (interaction) => {
             new MessageButton().setCustomId("not").setLabel("참가안함").setStyle("DANGER")
         );
         const embed = new MessageEmbed().setColor("#FFFFFF").setTitle("🛎 내전 모집");
-        await interaction.reply({
+        await interaction.editReply({
             embeds: [embed],
             components: [btn],
         });
