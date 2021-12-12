@@ -44,7 +44,7 @@ function memberProcess(arr, s1, s2) {
     return data;
 }
 
-let userList = [];
+let userList = ["ka", "ca", "test"];
 
 let memberCount = {};
 client.on("interactionCreate", async (interaction) => {
@@ -101,9 +101,13 @@ client.on("interactionCreate", async (interaction) => {
     }
 });
 
-client.on("interactionCreate", (interaction) => {
+client.on("interactionCreate", async (interaction) => {
+    let s1 = memberCount.a;
+    let s2 = memberCount.b;
     let returnMsg = "";
+    let checkMsg = "";
     if (!interaction.isButton()) return;
+    console.log(userList.length, s1, s2);
     if (interaction.customId === "join") {
         userList.push(interaction.member.nickname);
         returnMsg = "내전에 참여합니다.";
@@ -114,7 +118,17 @@ client.on("interactionCreate", (interaction) => {
         returnMsg =
             "내전에 참여하지 않습니다.\n참가 신청을 했던 경우 팀 리스트에서 삭제됩니다.";
     }
-    interaction.reply({ content: `${returnMsg}`, ephemeral: true });
+    await interaction.reply({ content: `${returnMsg}`, ephemeral: true });
+
+    if (userList.length >= s1 + s2) {
+        const embed = new MessageEmbed()
+            .setColor("#FFFFFF")
+            .setTitle("⚽️ 충분한 선수가 준비되었습니다!");
+        checkMsg = await interaction.channel.send({
+            embeds: [embed],
+            ephemeral: false,
+        });
+    }
 });
 
 client.login(token);
