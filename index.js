@@ -45,9 +45,8 @@ function memberProcess(arr, s1, s2) {
 }
 
 let userList = [];
-let memberCount = {
-    flag: true,
-};
+
+let memberCount = {};
 client.on("interactionCreate", async (interaction) => {
     const { commandName } = interaction;
     if (!interaction.isCommand()) return;
@@ -120,19 +119,13 @@ client.on("interactionCreate", async (interaction) => {
     await interaction.reply({ content: `${returnMsg}`, ephemeral: true });
 
     if (userList.length >= s1 + s2) {
-        if (memberCount.flag) {
-            const embed = new MessageEmbed()
-                .setColor("#FFFFFF")
-                .setTitle("⚽️ 충분한 선수가 준비되었습니다!");
-            checkMsg = await interaction.channel.send({
-                embeds: [embed],
-                ephemeral: false,
-            });
-            memberCount.flag = false;
-        }
-    }
-    if (userList.length < s1 + s2) {
-        memberCount.flag = true;
+        const embed = new MessageEmbed()
+            .setColor("#FFFFFF")
+            .setTitle("⚽️ 충분한 선수가 준비되었습니다!");
+        checkMsg = await interaction.channel.send({
+            embeds: [embed],
+            ephemeral: false,
+        });
     }
 });
 
