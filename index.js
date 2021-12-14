@@ -1,11 +1,5 @@
-const {
-    Client,
-    Intents,
-    MessageActionRow,
-    MessageButton,
-    MessageEmbed,
-} = require("discord.js");
-const { token } = require("./.config.json");
+const { Client, MessageActionRow, MessageButton, MessageEmbed } = require("discord.js");
+const { token_test } = require("./.config.json");
 
 const client = new Client({ intents: [32767] });
 
@@ -44,13 +38,15 @@ function memberProcess(arr, s1, s2) {
     return data;
 }
 
-let userList = [];
-
+let userList = ["a", "b", "c", "d", "e", "f"];
 let memberCount = {};
+
 client.on("interactionCreate", async (interaction) => {
     const { commandName } = interaction;
     if (!interaction.isCommand()) return;
     if (commandName === "team") {
+        memberCount.flag = true;
+        memberCount.splitFlag = true;
         await interaction.deferReply();
         memberCount.a = parseInt(interaction.options.getString("a"));
         memberCount.b = parseInt(interaction.options.getString("b"));
@@ -77,8 +73,10 @@ client.on("interactionCreate", async (interaction) => {
             } else {
                 embed = new MessageEmbed()
                     .setColor("#FFFFFF")
-                    .setTitle("⚽️ 인원이 부족합니다")
-                    .setDescription(`현재 신청 인원 ${result.length}명`);
+                    .setTitle("⚽️ 알림")
+                    .setDescription(
+                        `인원이 부족합니다.\n현재 신청 인원 ${result.length}명`
+                    );
             }
             await interaction.deferReply();
             await interaction.editReply({ embeds: [embed], components: [] });
@@ -87,7 +85,7 @@ client.on("interactionCreate", async (interaction) => {
                 .setColor("#FFFFFF")
                 .setTitle("⚽️ 결과")
                 .setDescription(
-                    `1️⃣팀 : ${result.t1}  \n\n 2️⃣팀 : ${result.t2} \n\n 📌 대기 : ${result.waitingMember}`
+                    `1️⃣ : ${result.t1}  \n\n 2️⃣ : ${result.t2} \n\n 📌 : ${result.waitingMember}`
                 );
             await interaction.deferReply();
             await interaction.editReply({ embeds: [embed], components: [] });
@@ -96,7 +94,8 @@ client.on("interactionCreate", async (interaction) => {
         userList = [];
         const embed = new MessageEmbed()
             .setColor("#FFFFFF")
-            .setTitle("⚽️ 인원이 리셋됩니다.");
+            .setTitle("⚽️ 알림")
+            .setDescription("인원이 리셋됩니다.");
         await interaction.reply({ embeds: [embed], components: [] });
     }
 });
@@ -119,14 +118,18 @@ client.on("interactionCreate", async (interaction) => {
     await interaction.reply({ content: `${returnMsg}`, ephemeral: true });
 
     if (userList.length >= s1 + s2) {
-        const embed = new MessageEmbed()
-            .setColor("#FFFFFF")
-            .setTitle("⚽️ 충분한 선수가 준비되었습니다!");
-        checkMsg = await interaction.channel.send({
-            embeds: [embed],
-            ephemeral: false,
-        });
+        if (memberCount.flag) {
+            const embed = new MessageEmbed()
+                .setColor("#FFFFFF")
+                .setTitle("⚽️ 알림")
+                .setDescription("충분한 선수가 준비되었습니다!");
+            checkMsg = await interaction.channel.send({
+                embeds: [embed],
+                ephemeral: false,
+            });
+            memberCount.flag = false;
+        }
     }
 });
 
-client.login(token);
+client.login(token_test);
