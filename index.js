@@ -60,33 +60,43 @@ client.on("interactionCreate", async (interaction) => {
             components: [btn],
         });
     } else if (commandName === "split") {
-        let s1 = memberCount.a;
-        let s2 = memberCount.b;
-        let result = memberProcess(userList, s1, s2);
-
         let embed;
-        if (!result.flag) {
-            if (result.length === 0) {
-                embed = new MessageEmbed()
-                    .setColor("#FFFFFF")
-                    .setTitle("⚽️ 인원을 모집해주세요");
+        if (memberCount.splitFlag) {
+            let s1 = memberCount.a;
+            let s2 = memberCount.b;
+            let result = memberProcess(userList, s1, s2);
+            if (!result.flag) {
+                if (result.length === 0) {
+                    embed = new MessageEmbed()
+                        .setColor("#FFFFFF")
+                        .setTitle("⚽️ 인원을 모집해주세요");
+                } else {
+                    embed = new MessageEmbed()
+                        .setColor("#FFFFFF")
+                        .setTitle("⚽️ 알림")
+                        .setDescription(
+                            `인원이 부족합니다. 현재 신청 인원 ${result.length}명`
+                        );
+                }
+                await interaction.deferReply();
+                await interaction.editReply({ embeds: [embed], components: [] });
             } else {
                 embed = new MessageEmbed()
                     .setColor("#FFFFFF")
-                    .setTitle("⚽️ 알림")
+                    .setTitle("⚽️ 결과")
                     .setDescription(
-                        `인원이 부족합니다.\n현재 신청 인원 ${result.length}명`
+                        `1️⃣ : ${result.t1}  \n\n 2️⃣ : ${result.t2} \n\n 📌 : ${result.waitingMember}`
                     );
+                await interaction.deferReply();
+                await interaction.editReply({ embeds: [embed], components: [] });
             }
-            await interaction.deferReply();
-            await interaction.editReply({ embeds: [embed], components: [] });
-        } else {
-            const embed = new MessageEmbed()
+            memberCount.splitFlag = false;
+        } else if (!memberCount.splitFlag) {
+            userList = [];
+            embed = new MessageEmbed()
                 .setColor("#FFFFFF")
-                .setTitle("⚽️ 결과")
-                .setDescription(
-                    `1️⃣ : ${result.t1}  \n\n 2️⃣ : ${result.t2} \n\n 📌 : ${result.waitingMember}`
-                );
+                .setTitle("⚽️ 알림")
+                .setDescription("모집을 다시 실행시켜주세요. 인원이 리셋됩니다.");
             await interaction.deferReply();
             await interaction.editReply({ embeds: [embed], components: [] });
         }
@@ -106,14 +116,16 @@ client.on("interactionCreate", async (interaction) => {
     let returnMsg = "";
     if (!interaction.isButton()) return;
     if (interaction.customId === "join") {
+        memberCount.splitFlag = true;
         userList.push(interaction.member.nickname);
         returnMsg = "내전에 참여합니다.";
     } else if (interaction.customId === "not") {
+        memberCount.splitFlag = true;
         if (userList.indexOf(interaction.member.nickname)) {
             userList.splice(userList.indexOf(interaction.member.nickname));
         }
         returnMsg =
-            "내전에 참여하지 않습니다.\n참가 신청을 했던 경우 팀 리스트에서 삭제됩니다.";
+            "내전에 참여하지 않습니다. 참가 신청을 했던 경우 팀 리스트에서 삭제됩니다.";
     }
     await interaction.reply({ content: `${returnMsg}`, ephemeral: true });
 
