@@ -1,5 +1,5 @@
 const { Client, MessageActionRow, MessageButton, MessageEmbed } = require("discord.js");
-const { token_test } = require("./.config.json");
+const { token } = require("./.config.json");
 
 const client = new Client({ intents: [32767] });
 
@@ -144,4 +144,4 @@ client.on("interactionCreate", async (interaction) => {
     }
 });
 
-client.login(token_test);
+client.login(token);
