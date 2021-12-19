@@ -5,7 +5,7 @@ const client = new Client({ intents: [32767] });
 
 client.once("ready", () => {
     console.log("Ready!");
-    client.user.setActivity("축구", { type: "WATCHING" });
+    client.user.setActivity("리그", { type: "WATCHING" });
 });
 
 function memberProcess(arr, s1, s2) {
